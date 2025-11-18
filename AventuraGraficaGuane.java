@@ -25,19 +25,7 @@ public class AventuraGraficaGuane {
         this.puntos = 0;
         this.esGuardian = false;
         this.arbolActual = 0;
-        verificarRecursos();
         inicializarInterfaz();
-    }
-    
-    private void verificarRecursos() {
-        String[] archivosNecesarios = {"1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg"};
-        System.out.println("=== VERIFICACIÓN DE RECURSOS ===");
-        
-        for (String archivo : archivosNecesarios) {
-            File f = new File("recursos/" + archivo);
-            System.out.println(archivo + " → " + (f.exists() ? "✅ ENCONTRADO" : "❌ NO ENCONTRADO"));
-        }
-        System.out.println("=================================");
     }
     
     private void inicializarInterfaz() {
@@ -45,6 +33,18 @@ public class AventuraGraficaGuane {
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setSize(1000, 750);
         ventana.setLocationRelativeTo(null);
+        
+        // ⭐⭐ LOGO - USA SOLO PNG QUE FUNCIONA MEJOR ⭐⭐
+        try {
+            ImageIcon icono = new ImageIcon("logo.png");
+            // Redimensionar a tamaño adecuado para icono
+            Image imagen = icono.getImage();
+            Image iconoRedimensionado = imagen.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+            ventana.setIconImage(iconoRedimensionado);
+            System.out.println("✅ Logo PNG cargado correctamente");
+        } catch (Exception e) {
+            System.out.println("❌ Error cargando logo: " + e.getMessage());
+        }
         
         cardLayout = new CardLayout();
         panelPrincipal = new JPanel(cardLayout);
@@ -62,48 +62,25 @@ public class AventuraGraficaGuane {
     }
     
     private JLabel crearImagenLabel(String nombreArchivo, String textoAlternativo, int ancho, int alto) {
-        // Prueba diferentes rutas posibles
-        String[] rutasPosibles = {
-            "recursos/" + nombreArchivo,
-            "./recursos/" + nombreArchivo,
-            "../recursos/" + nombreArchivo,
-            "src/recursos/" + nombreArchivo
-        };
+        String ruta = "recursos/" + nombreArchivo;
+        File archivo = new File(ruta);
         
-        for (String ruta : rutasPosibles) {
-            File archivo = new File(ruta);
-            if (archivo.exists()) {
-                try {
-                    ImageIcon iconoOriginal = new ImageIcon(ruta);
-                    Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
-                    JLabel label = new JLabel(new ImageIcon(imagenEscalada));
-                    label.setToolTipText(textoAlternativo);
-                    return label;
-                } catch (Exception e) {
-                    System.out.println("Error cargando imagen: " + ruta);
-                }
-            }
+        if (archivo.exists()) {
+            ImageIcon iconoOriginal = new ImageIcon(ruta);
+            Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+            JLabel label = new JLabel(new ImageIcon(imagenEscalada));
+            label.setToolTipText(textoAlternativo);
+            return label;
+        } else {
+            // Si no encuentra la imagen, mostrar un placeholder con el número
+            JLabel placeholder = new JLabel("<html><center>🖼️ " + textoAlternativo + "</center></html>", JLabel.CENTER);
+            placeholder.setFont(new Font("Arial", Font.ITALIC, 14));
+            placeholder.setOpaque(true);
+            placeholder.setBackground(Color.LIGHT_GRAY);
+            placeholder.setPreferredSize(new Dimension(ancho, alto));
+            placeholder.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+            return placeholder;
         }
-        
-        // Si no encuentra ninguna imagen, mostrar placeholder mejorado
-        JLabel placeholder = new JLabel(
-            "<html><center>📷 " + textoAlternativo + "<br><small>No encontrada: " + nombreArchivo + "</small></center></html>", 
-            JLabel.CENTER
-        );
-        placeholder.setFont(new Font("Arial", Font.ITALIC, 12));
-        placeholder.setOpaque(true);
-        placeholder.setBackground(Color.LIGHT_GRAY);
-        placeholder.setPreferredSize(new Dimension(ancho, alto));
-        placeholder.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        
-        // Debug: mostrar en consola qué archivo no se encontró
-        System.out.println("Imagen no encontrada: " + nombreArchivo);
-        System.out.println("Buscada en:");
-        for (String ruta : rutasPosibles) {
-            System.out.println("  - " + ruta + " → " + (new File(ruta).exists() ? "EXISTE" : "NO EXISTE"));
-        }
-        
-        return placeholder;
     }
     
     private void crearPantallaBienvenida() {
@@ -351,11 +328,10 @@ public class AventuraGraficaGuane {
                 JOptionPane.WARNING_MESSAGE);
         }
         
-        if (arbolActual < bioparque.getArboles().size() - 1) {
+        if (arbolActual < 2) {
             arbolActual++;
             actualizarPantallaArbol();
         } else {
-            actualizarPantallaComunidad();
             cardLayout.show(panelPrincipal, "comunidad");
         }
     }

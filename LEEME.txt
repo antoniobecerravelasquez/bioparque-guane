@@ -1,0 +1,7 @@
+BIOPARQUE GUANE - AVENTURA GRµFICA 
+ 
+PARA EJECUTAR: 
+1. Haz doble clic en "Ejecutar.bat" 
+2. Aseg£rate de tener Java instalado 
+ 
+­Disfruta del viaje! 
